@@ -4,95 +4,95 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         AWS REGION (us-east-1)                       │
-│                                                                       │
+│                         AWS REGION (us-east-1)                      │
+│                                                                     │
 │  ┌────────────────────────────────────────────────────────────────┐ │
-│  │                          VPC (10.0.0.0/16)                    │ │
+│  │                          VPC (10.0.0.0/16)                     │ │
 │  │                                                                │ │
-│  │  ┌─────────────────────────────────────────────────────────┐ │ │
-│  │  │  PUBLIC SUBNETS (IGW-Accessible)                        │ │ │
-│  │  │                                                          │ │ │
-│  │  │  Subnet-1 (10.0.1.0/24) - AZ-a                          │ │ │
-│  │  │  ┌────────────────────────────────────────────────┐    │ │ │
-│  │  │  │ Nginx Server (Frontend)                        │    │ │ │
-│  │  │  │ EC2 Instance (t3.micro)                        │    │ │ │
-│  │  │  │ Public IP: 54.x.x.x                           │    │ │ │
-│  │  │  │ Port: 80 (HTTP)                               │    │ │ │
-│  │  │  └────────────────────────────────────────────────┘    │ │ │
-│  │  │                                                          │ │ │
-│  │  │  Subnet-2 (10.0.2.0/24) - AZ-b                          │ │ │
-│  │  │  ┌────────────────────────────────────────────────┐    │ │ │
-│  │  │  │ NAT Gateway                                    │    │ │ │
-│  │  │  │ Allows private→internet                        │    │ │ │
-│  │  │  │ Elastic IP: x.x.x.x                          │    │ │ │
-│  │  │  └────────────────────────────────────────────────┘    │ │ │
-│  │  │                                                          │ │ │
-│  │  │  ┌────────────────────────────────────────────────┐    │ │ │
-│  │  │  │ ALB (Application Load Balancer)                │    │ │ │
-│  │  │  │ DNS: app-lb-xxxxx.elb.amazonaws.com           │    │ │ │
-│  │  │  │ Port: 80                                       │    │ │ │
-│  │  │  │ Health Check: GET / every 30s                 │    │ │ │
-│  │  │  │ Routing: frontend.nginx:80                    │    │ │ │
-│  │  │  └────────────────────────────────────────────────┘    │ │ │
-│  │  └─────────────────────────────────────────────────────────┘ │ │
-│  │                          ↓ Route Table                        │ │
-│  │                   0.0.0.0/0 → IGW                            │ │
+│  │  ┌─────────────────────────────────────────────────────────┐   │ │
+│  │  │  PUBLIC SUBNETS (IGW-Accessible)                        │   │ │
+│  │  │                                                         │   │ │
+│  │  │  Subnet-1 (10.0.1.0/24) - AZ-a                          │   │ │
+│  │  │  ┌────────────────────────────────────────────────┐     │   │ │
+│  │  │  │ Nginx Server (Frontend)                        │     │   │ │
+│  │  │  │ EC2 Instance (t3.micro)                        │     │   │ │
+│  │  │  │ Public IP: 54.x.x.x                            │     │   │ │
+│  │  │  │ Port: 80 (HTTP)                                │     │   │ │
+│  │  │  └────────────────────────────────────────────────┘     │   │ │
+│  │  │                                                         │   │ │
+│  │  │  Subnet-2 (10.0.2.0/24) - AZ-b                          │   │ │
+│  │  │  ┌────────────────────────────────────────────────┐     │   │ │
+│  │  │  │ NAT Gateway                                    │     │   │ │
+│  │  │  │ Allows private→internet                        │     │   │ │
+│  │  │  │ Elastic IP: x.x.x.x                            │     │   │ │
+│  │  │  └────────────────────────────────────────────────┘     │   │ │
+│  │  │                                                         │   │ │
+│  │  │  ┌────────────────────────────────────────────────┐     │   │ │
+│  │  │  │ ALB (Application Load Balancer)                │     │   │ │
+│  │  │  │ DNS: app-lb-xxxxx.elb.amazonaws.com            │     │   │ │
+│  │  │  │ Port: 80                                       │     │   │ │
+│  │  │  │ Health Check: GET / every 30s                  │     │   │ │
+│  │  │  │ Routing: frontend.nginx:80                     │     │   │ │
+│  │  │  └────────────────────────────────────────────────┘     │   │ │
+│  │  └─────────────────────────────────────────────────────────┘   │ │
+│  │                          ↓ Route Table                         │ │
+│  │                   0.0.0.0/0 → IGW                              │ │
 │  │                                                                │ │
-│  │  ┌─────────────────────────────────────────────────────────┐ │ │
-│  │  │  PRIVATE SUBNETS (NAT-Accessible Only)                 │ │ │
-│  │  │                                                          │ │ │
-│  │  │  Subnet-3 (10.0.3.0/24) - AZ-a                          │ │ │
-│  │  │  ┌────────────────────────────────────────────────┐    │ │ │
-│  │  │  │ Node.js Backend API                           │    │ │ │
-│  │  │  │ EC2 Instance (t3.micro)                        │    │ │ │
-│  │  │  │ Private IP: 10.0.3.x                          │    │ │ │
-│  │  │  │ Port: 3000 (HTTP)                             │    │ │ │
-│  │  │  │ Routes:                                        │    │ │ │
-│  │  │  │   GET  /health    → Server status            │    │ │ │
-│  │  │  │   POST /register  → Insert user to RDS       │    │ │ │
-│  │  │  │                                                │    │ │ │
-│  │  │  │ Connected to: MySQL via TCP:3306             │    │ │ │
-│  │  │  └────────────────────────────────────────────────┘    │ │ │
-│  │  │                                                          │ │ │
-│  │  │  Subnet-4 (10.0.4.0/24) - AZ-b                          │ │ │
-│  │  │  ┌────────────────────────────────────────────────┐    │ │ │
-│  │  │  │ RDS MySQL Database                            │    │ │ │
-│  │  │  │ Instance: db.t4g.micro                         │    │ │ │
-│  │  │  │ Version: MySQL 8.0                            │    │ │ │
-│  │  │  │ Endpoint: mydb.xxxxx.rds.amazonaws.com        │    │ │ │
-│  │  │  │ Port: 3306 (MySQL)                            │    │ │ │
-│  │  │  │ Storage: 20 GB                                │    │ │ │
-│  │  │  │ Database: mydb                                │    │ │ │
-│  │  │  │ User: admin / password123                     │    │ │ │
-│  │  │  │ Multi-AZ: Enabled (Standby in AZ-b)          │    │ │ │
-│  │  │  │ Table: users (name, email)                   │    │ │ │
-│  │  │  └────────────────────────────────────────────────┘    │ │ │
-│  │  │                                                          │ │ │
-│  │  └─────────────────────────────────────────────────────────┘ │ │
-│  │                          ↓ Route Table                        │ │
-│  │                   0.0.0.0/0 → NAT                            │ │
+│  │  ┌─────────────────────────────────────────────────────────┐   │ │
+│  │  │  PRIVATE SUBNETS (NAT-Accessible Only)                  │   │ │
+│  │  │                                                         │   │ │
+│  │  │  Subnet-3 (10.0.3.0/24) - AZ-a                          │   │ │
+│  │  │  ┌────────────────────────────────────────────────┐     │   │ │
+│  │  │  │ Node.js Backend API                            │     │   │ │
+│  │  │  │ EC2 Instance (t3.micro)                        │     │   │ │
+│  │  │  │ Private IP: 10.0.3.x                           │     │   │ │
+│  │  │  │ Port: 3000 (HTTP)                              │     │   │ │
+│  │  │  │ Routes:                                        │     │   │ │
+│  │  │  │   GET  /health    → Server status              │     │   │ │
+│  │  │  │   POST /register  → Insert user to RDS         │     │   │ │
+│  │  │  │                                                │     │   │ │
+│  │  │  │ Connected to: MySQL via TCP:3306               │     │   │ │
+│  │  │  └────────────────────────────────────────────────┘     │   │ │
+│  │  │                                                         │   │ │
+│  │  │  Subnet-4 (10.0.4.0/24) - AZ-b                          │   │ │
+│  │  │  ┌────────────────────────────────────────────────┐     │   │ │
+│  │  │  │ RDS MySQL Database                             │     │   │ │
+│  │  │  │ Instance: db.t4g.micro                         │     │   │ │
+│  │  │  │ Version: MySQL 8.0                             │     │   │ │
+│  │  │  │ Endpoint: mydb.xxxxx.rds.amazonaws.com         │     │   │ │
+│  │  │  │ Port: 3306 (MySQL)                             │     │   │ │
+│  │  │  │ Storage: 20 GB                                 │     │   │ │
+│  │  │  │ Database: mydb                                 │     │   │ │
+│  │  │  │ User: admin / password123                      │     │   │ │
+│  │  │  │ Multi-AZ: Enabled (Standby in AZ-b)            │     │   │ │
+│  │  │  │ Table: users (name, email)                     │     │   │ │
+│  │  │  └────────────────────────────────────────────────┘     │   │ │
+│  │  │                                                         │   │ │
+│  │  └─────────────────────────────────────────────────────────┘   │ │
+│  │                          ↓ Route Table                         │ │
+│  │                   0.0.0.0/0 → NAT                              │ │
 │  │                                                                │ │
-│  │  SECURITY GROUPS (Firewalls):                                │ │
-│  │  ┌─ ALB_SG:                                                  │ │
-│  │  │  Ingress:  80 from 0.0.0.0/0                             │ │
-│  │  │  Egress:   All                                             │ │
+│  │  SECURITY GROUPS (Firewalls):                                  │ │
+│  │  ┌─ ALB_SG:                                                    │ │
+│  │  │  Ingress:  80 from 0.0.0.0/0                                │ │
+│  │  │  Egress:   All                                              │ │
 │  │  │                                                             │ │
-│  │  ├─ FRONTEND_SG:                                              │ │
-│  │  │  Ingress:  80 from ALB_SG, 22 from 0.0.0.0/0            │ │
-│  │  │  Egress:   All                                             │ │
+│  │  ├─ FRONTEND_SG:                                               │ │
+│  │  │  Ingress:  80 from ALB_SG, 22 from 0.0.0.0/0                │ │
+│  │  │  Egress:   All                                              │ │
 │  │  │                                                             │ │
-│  │  ├─ BACKEND_SG:                                               │ │
-│  │  │  Ingress:  3000 from FRONTEND_SG, 22 from 0.0.0.0/0      │ │
-│  │  │  Egress:   All                                             │ │
+│  │  ├─ BACKEND_SG:                                                │ │
+│  │  │  Ingress:  3000 from FRONTEND_SG, 22 from 0.0.0.0/0         │ │
+│  │  │  Egress:   All                                              │ │
 │  │  │                                                             │ │
-│  │  └─ RDS_SG:                                                   │ │
-│  │     Ingress:  3306 from BACKEND_SG                           │ │
-│  │     Egress:   All                                             │ │
+│  │  └─ RDS_SG:                                                    │ │
+│  │     Ingress:  3306 from BACKEND_SG                             │ │
+│  │     Egress:   All                                              │ │
 │  │                                                                │ │
 │  └────────────────────────────────────────────────────────────────┘ │
-│                                                                       │
-│                    ↑ Internet Gateway (IGW)                          │
-│                                                                       │
+│                                                                     │
+│                    ↑ Internet Gateway (IGW)                         │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 
                            INTERNET
@@ -116,7 +116,7 @@ SCENARIO: User registers a new cloud node through web dashboard
             │
             ▼ HTTP Request to ALB DNS name
    ┌─────────────────────────────────────────────────────┐
-   │ http://app-lb-xxxxx.elb.amazonaws.com/             │
+   │ http://app-lb-xxxxx.elb.amazonaws.com/              │
    └────────┬────────────────────────────────────────────┘
             │ POST body: {name: "node1", email: "admin@example.com"}
             │
@@ -137,13 +137,13 @@ SCENARIO: User registers a new cloud node through web dashboard
    │                                                     │
    │ Path: /                                             │
    │ ├─ Static content (index.html, CSS, JS)             │
-   │ └─ Return to client → Dashboard displayed         │
+   │ └─ Return to client → Dashboard displayed           │
    │                                                     │
    │ Path: /api/*                                        │
-   │ └─ Proxy to Backend (10.0.3.x:3000/...)            │
+   │ └─ Proxy to Backend (10.0.3.x:3000/...)             │
    │                                                     │
-   │ For our request:                                   │
-   │ POST /api/register → Proxied to 10.0.3.x:3000     │
+   │ For our request:                                    │
+   │ POST /api/register → Proxied to 10.0.3.x:3000       │
    └────────┬────────────────────────────────────────────┘
             │ ProxyPass: http://10.0.3.x:3000/register
             │ Headers passed: Content-Type, User-Agent, etc.
@@ -153,10 +153,10 @@ SCENARIO: User registers a new cloud node through web dashboard
    ┌─────────────────────────────────────────────────────┐
    │ Node.js Backend (Port 3000)                         │
    │                                                     │
-   │ POST /register request received                    │
-   │ ├─ CORS headers added                              │
-   │ ├─ Parse JSON body                                 │
-   │ ├─ Extract: name="node1", email="admin@..."        │
+   │ POST /register request received                     │
+   │ ├─ CORS headers added                               │
+   │ ├─ Parse JSON body                                  │
+   │ ├─ Extract: name="node1", email="admin@..."         │
    │ └─ Call database                                    │
    └────────┬────────────────────────────────────────────┘
             │ SQL: INSERT INTO users (name, email) VALUES (?, ?)
@@ -170,7 +170,7 @@ SCENARIO: User registers a new cloud node through web dashboard
    │ ├─ Receives INSERT statement                        │
    │ ├─ Validates query                                  │
    │ ├─ Writes to disk (InnoDB)                          │
-   │ ├─ Replicates to standby (Multi-AZ)                │
+   │ ├─ Replicates to standby (Multi-AZ)                 │
    │ └─ Returns: Query OK                                │
    └────────┬────────────────────────────────────────────┘
             │ Response: Query executed successfully
@@ -183,7 +183,7 @@ SCENARIO: User registers a new cloud node through web dashboard
    │ ├─ No error from database                           │
    │ ├─ Generate response JSON                           │
    │ ├─ {message: "User Registered Successfully!"}       │
-   │ └─ Send back to Nginx                              │
+   │ └─ Send back to Nginx                               │
    └────────┬────────────────────────────────────────────┘
             │ HTTP 200 OK with JSON body
             │
@@ -280,53 +280,53 @@ SECURITY LAYERS (Defense in Depth)
 
 ┌─────────────────────────────────────────────────────────────┐
 │ LAYER 1: Network Level (VPC)                                │
-│                                                              │
+│                                                             │
 │ Frontend in Public Subnet ─┐                                │
-│                             │                                │
+│                             │                               │
 │ Backend in Private Subnet ──┼─→ Only NAT Gateway internet   │
-│                             │                                │
-│ Database in Private Subnet ─┘                                │
-│                                                              │
+│                             │                               │
+│ Database in Private Subnet ─┘                               │
+│                                                             │
 │ Benefit: Database never exposed to internet                 │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ LAYER 2: Security Groups (Firewalls)                        │
-│                                                              │
+│                                                             │
 │ Frontend ──80──→ ALB ──[allowed]──→ Frontend:80             │
 │            │                                                │
 │            └─→ Port 443/8080/etc [BLOCKED]                  │
-│                                                              │
-│ Backend ──3000──→ Frontend ──[allowed]──→ Backend:3000       │
+│                                                             │
+│ Backend ──3000──→ Frontend ──[allowed]──→ Backend:3000      │
 │           │                                                 │
 │           └─→ RDS/Other ports [BLOCKED]                     │
-│                                                              │
+│                                                             │
 │ RDS ──3306──→ Backend ──[allowed]──→ RDS:3306               │
 │        │                                                    │
-│        └─→ Frontend/Other sources [BLOCKED]                │
-│                                                              │
+│        └─→ Frontend/Other sources [BLOCKED]                 │
+│                                                             │
 │ Benefit: Only required ports accessible                     │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ LAYER 3: Application Level                                  │
-│                                                              │
+│                                                             │
 │ ├─ CORS headers (prevent unauthorized domains)              │
 │ ├─ Input validation (prevent injection)                     │
 │ ├─ Error handling (don't leak internal details)             │
 │ └─ Rate limiting (prevent abuse)                            │
-│                                                              │
+│                                                             │
 │ Benefit: Application-level security controls                │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ LAYER 4: Database Level                                     │
-│                                                              │
+│                                                             │
 │ ├─ User/password authentication                             │
 │ ├─ Parameterized queries (prevent SQL injection)            │
 │ ├─ Principle of least privilege (minimal permissions)       │
 │ └─ Encrypted connections (SSL/TLS)                          │
-│                                                              │
+│                                                             │
 │ Benefit: Database-level security controls                   │
 └─────────────────────────────────────────────────────────────┘
 
