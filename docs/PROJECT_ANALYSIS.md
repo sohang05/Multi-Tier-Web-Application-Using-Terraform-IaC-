@@ -589,279 +589,6 @@ Why PM2?
 
 ---
 
-## INTERVIEW QUESTIONS
-
-### 1. **Architecture & Design**
-
-**Q1: Explain the 3-tier architecture used in this project**
-```
-A: The application is divided into:
-1. Presentation Tier (Nginx) - Handles HTTP requests, serves static content
-2. Application Tier (Node.js) - Processes business logic, exposes APIs
-3. Data Tier (MySQL) - Stores and retrieves data
-
-Benefits: Independent scaling, easier maintenance, better security
-```
-
-**Q2: Why is the backend in a private subnet?**
-```
-A: Backend shouldn't be directly accessible from internet for security
-- Only accessible from frontend/ALB
-- Uses NAT Gateway for outbound internet access
-- Reduces attack surface
-- Implements security through network isolation
-```
-
-**Q3: How does traffic flow from user to database?**
-```
-A: Internet → ALB:80 → Nginx:80 → Node.js:3000 → MySQL:3306
-- ALB distributes traffic
-- Nginx proxies /api requests
-- Node.js queries MySQL
-- Response travels back through same path
-```
-
----
-
-### 2. **Terraform & IaC**
-
-**Q4: Why use modules in Terraform?**
-```
-A: Modules provide:
-- Code reusability (use same module multiple times)
-- Maintainability (changes in one place)
-- Encapsulation (hide complexity)
-- Composition (combine modules to build infrastructure)
-- Team collaboration (shared modules)
-```
-
-**Q5: What would happen if you forgot `depends_on`?**
-```
-A: Frontend creation might fail because:
-- Backend IP not available yet
-- Terraform tries to create in parallel
-- Dependency ensures correct order
-- Without it: race condition
-```
-
-**Q6: How do you pass data between modules?**
-```
-A: Through outputs and variables:
-- Module A outputs value (e.g., VPC ID)
-- Module B takes it as input (variable)
-- Main.tf wires them together
-- Example: VPC ID from vpc module → sg module
-```
-
----
-
-### 3. **AWS Services**
-
-**Q7: What's the difference between Security Group and Network ACL?**
-```
-A: 
-Security Groups:
-- Stateful (return traffic allowed automatically)
-- Instance-level
-- Allow/Deny rules
-- Applied to instances
-
-Network ACLs:
-- Stateless (must explicitly allow return)
-- Subnet-level
-- Only Allow/Deny
-- Default allow all
-
-In this project: Only Security Groups used (simpler)
-```
-
-**Q8: Why use Application Load Balancer instead of Classic Load Balancer?**
-```
-A: ALB advantages:
-- Layer 7 (application) routing (path-based, host-based)
-- Better for microservices
-- WebSocket support
-- Better performance
-- Cost-effective
-
-Classic LB:
-- Layer 4 only (connection-level)
-- Simple round-robin
-- Limited routing options
-```
-
-**Q9: What if you need to add another backend instance?**
-```
-A:
-1. Create another ec2 module instance
-2. Add to ALB target group
-3. Update security group rules if needed
-4. Terraform handles rest
-
-Scaling would require:
-- More module calls
-- ALB target group attachments
-- Possibly increase RDS capacity
-```
-
----
-
-### 4. **Security**
-
-**Q10: Why is the database password hardcoded?**
-```
-A: IT SHOULDN'T BE! This is a bad practice.
-
-For production:
-- Use AWS Secrets Manager
-- Use Parameter Store
-- Use Terraform variables with .tfvars
-- Use IAM database authentication
-- Never commit passwords to Git
-```
-
-**Q11: How would you secure SSH access?**
-```
-A: Instead of open 0.0.0.0/0:
-- Restrict to your IP: 203.0.113.0/32
-- Use bastion host
-- Disable SSH, use Systems Manager Sessions
-- Use VPN for access
-```
-
-**Q12: What's the security benefit of private subnets?**
-```
-A: Private subnets:
-- Block direct internet access
-- Force traffic through NAT Gateway (logging point)
-- Reduce attack surface
-- Prevent accidental exposure
-- Add network isolation layer
-```
-
----
-
-### 5. **Operations & Troubleshooting**
-
-**Q13: How would you debug if the backend is unreachable?**
-```
-A: Check in order:
-1. Is backend EC2 running? (EC2 console)
-2. Is security group allowing traffic? (Port 3000)
-3. Is Node.js process running? (SSH to instance)
-4. Are there logs? (App logs in /home/ubuntu/backend.log)
-5. Can you ping from frontend? (SSH to frontend, curl)
-6. Is the IP correct? (Check Terraform outputs)
-```
-
-**Q14: What if Terraform apply fails?**
-```
-A:
-1. Check error message carefully
-2. Validate with `terraform validate`
-3. Plan with `terraform plan`
-4. Check AWS limits (VPC limit, IAM, etc.)
-5. Ensure permissions are correct
-6. Check for syntax errors
-7. Review outputs of dependent modules
-```
-
-**Q15: How would you update the app without destroying infrastructure?**
-```
-A: For code changes:
-1. SSH to backend instance
-2. Update app.js
-3. Restart Node.js: pm2 restart backend-api
-4. No infrastructure change needed
-
-For infrastructure changes:
-1. Modify Terraform files
-2. Run terraform plan
-3. Review changes
-4. Run terraform apply
-5. Terraform intelligently updates only changed resources
-```
-
----
-
-### 6. **Cost & Performance**
-
-**Q16: Why use t3.micro instances?**
-```
-A:
-- Free tier eligible (first year)
-- Good for low-traffic applications
-- Burstable performance
-- Cost-effective for learning
-
-For production:
-- Would use t3.small or larger
-- Consider reserved instances
-- Use auto-scaling
-```
-
-**Q17: What would happen with high traffic?**
-```
-A: Current bottlenecks:
-- t3.micro CPU limited (burstable)
-- Single backend instance
-- Single RDS instance
-
-Solutions:
-- Auto Scaling Groups for frontend
-- Multiple backend instances
-- RDS read replicas
-- ElastiCache for caching
-- CDN for static content
-```
-
----
-
-### 7. **Improvements & Future**
-
-**Q18: How would you add HTTPS?**
-```
-A:
-1. Get SSL certificate from ACM
-2. Add listener on port 443
-3. Create certificate on ALB
-4. Redirect HTTP→HTTPS
-5. Update security groups
-
-Implementation:
-- ALB supports SSL termination
-- No changes needed to backend
-- Transparent to application
-```
-
-**Q19: How would you monitor the application?**
-```
-A: Implement:
-- CloudWatch metrics (CPU, memory, network)
-- ALB access logs (all requests)
-- Application logs (backend errors)
-- Database metrics (connections, queries)
-- Alarms (high CPU, unhealthy targets)
-- Dashboards (unified view)
-```
-
-**Q20: How would you implement auto-scaling?**
-```
-A:
-1. Create Launch Template from current setup
-2. Create Auto Scaling Group
-3. Set min/max instances
-4. Create scaling policies
-5. ALB automatically includes new instances
-
-Benefits:
-- Handle traffic spikes
-- Cost optimization (scale down when idle)
-- High availability
-```
-
----
-
 ## ALTERNATIVES & COMPARISON
 
 ### Alternative 1: Kubernetes (EKS)
@@ -1346,28 +1073,28 @@ Add:
 ### Skills Developed
 ```
 🔧 Technical Skills:
-├─ Terraform (Advanced)
-├─ AWS (Intermediate-Advanced)
-├─ Networking (Intermediate)
-├─ DevOps (Intermediate)
-├─ Bash Scripting (Intermediate)
-├─ Node.js (Intermediate)
-└─ Database (Intermediate)
+- Terraform (Advanced)
+- AWS (Intermediate-Advanced)
+- Networking (Intermediate)
+- DevOps (Intermediate)
+- Bash Scripting (Intermediate)
+- Node.js (Intermediate)
+- Database (Intermediate)
 
 🧠 Conceptual Skills:
-├─ Infrastructure as Code
-├─ Cloud architecture
-├─ Security principles
-├─ Scalability patterns
-├─ High availability
-└─ Disaster recovery
+- Infrastructure as Code
+- Cloud architecture
+- Security principles
+- Scalability patterns
+- High availability
+- Disaster recovery
 
 🏢 Professional Skills:
-├─ Documentation
-├─ Problem solving
-├─ Systems thinking
-├─ Code organization
-└─ Best practices
+- Documentation
+- Problem solving
+- Systems thinking
+- Code organization
+- Best practices
 ```
 
 ---
