@@ -7,10 +7,9 @@
 4. [Scripts & Components](#scripts--components)
 5. [Technology Stack](#technology-stack)
 6. [Key Concepts](#key-concepts)
-7. [Interview Questions](#interview-questions)
-8. [Alternatives & Comparison](#alternatives--comparison)
-9. [Improvements & Enhancements](#improvements--enhancements)
-10. [Learning Outcomes](#learning-outcomes)
+7. [Alternatives & Comparison](#alternatives--comparison)
+8. [Improvements & Enhancements](#improvements--enhancements)
+9. [Learning Outcomes](#learning-outcomes)
 
 ---
 
