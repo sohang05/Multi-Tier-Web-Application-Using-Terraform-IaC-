@@ -46,21 +46,21 @@ This repository contains a complete infrastructure setup for a cloud-native 3-ti
 │              AWS Region (us-east-1)                 │
 ├─────────────────────────────────────────────────────┤
 │                                                     │
-│  ┌──────────────────────────────────────────────┐  │
-│  │  PUBLIC SUBNETS (Internet Accessible)        │  │
-│  │                                              │  │
-│  │  ├─ Nginx Frontend Server (EC2 t3.micro)    │  │
-│  │  ├─ Application Load Balancer (ALB)          │  │
-│  │  └─ NAT Gateway                              │  │
-│  └──────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  PUBLIC SUBNETS (Internet Accessible)        │   │
+│  │                                              │   │
+│  │  ├─ Nginx Frontend Server (EC2 t3.micro)     │   │
+│  │  ├─ Application Load Balancer (ALB)          │   │
+│  │  └─ NAT Gateway                              │   │
+│  └──────────────────────────────────────────────┘   │
 │                       ↓                             │
-│  ┌──────────────────────────────────────────────┐  │
-│  │  PRIVATE SUBNETS (Internal Only)             │  │
-│  │                                              │  │
-│  │  ├─ Node.js Backend API (EC2 t3.micro)     │  │
-│  │  ├─ MySQL RDS Database (db.t4g.micro)      │  │
-│  │  └─ Multi-AZ Standby Database               │  │
-│  └──────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  PRIVATE SUBNETS (Internal Only)             │   │
+│  │                                              │   │
+│  │  ├─ Node.js Backend API (EC2 t3.micro)       │   │
+│  │  ├─ MySQL RDS Database (db.t4g.micro)        │   │
+│  │  └─ Multi-AZ Standby Database                │   │
+│  └──────────────────────────────────────────────┘   │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
