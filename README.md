@@ -64,6 +64,13 @@ This repository contains a complete infrastructure setup for a cloud-native 3-ti
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
+## 📸 Screenshots 
+<img width="959" height="500" alt="Cloud Health Dashboard" src="https://github.com/user-attachments/assets/0affa20b-30d7-41e7-a3d8-c0c6c3a549c6" />
+<img width="1918" height="1003" alt="Screenshot 2026-04-13 155153" src="https://github.com/user-attachments/assets/474548b7-5e40-4e17-837f-e3b919de9fc1" />
+<img width="1903" height="1008" alt="Screenshot 2026-04-13 155240" src="https://github.com/user-attachments/assets/4ab42149-29cd-4c0b-9d54-8fc18f6c2f40" />
+
+
+
 
 ### Three Tiers Explained
 
