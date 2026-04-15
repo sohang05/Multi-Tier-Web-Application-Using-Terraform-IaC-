@@ -626,8 +626,6 @@ Contributions are welcome! Areas for enhancement:
 - [ ] Add disaster recovery documentation
 - [ ] Create deployment runbooks
 
-See [IMPROVEMENTS.md](docs/IMPROVEMENTS.md) for detailed enhancement ideas.
-
 ---
 
 ## 📄 License
@@ -647,16 +645,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Terraform Examples](https://github.com/hashicorp/terraform-provider-aws/tree/main/examples)
 - [AWS Workshops](https://aws.amazon.com/builders/)
 
-### Learning Resources
-- [Cloud Academy](https://cloudacademy.com/)
-- [A Cloud Guru](https://acloudguru.com/)
-- [Linux Academy](https://linuxacademy.com/)
-
 ---
 
 ## 👨‍💼 Author
 
-Created as a DevOps portfolio project demonstrating:
+Created as a Cloud Engineer portfolio project demonstrating:
 - Modern cloud architecture
 - Infrastructure automation
 - Security best practices
